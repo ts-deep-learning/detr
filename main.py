@@ -16,6 +16,7 @@ from datasets import build_dataset, get_coco_api_from_dataset
 from engine import evaluate, train_one_epoch
 from models import build_model
 
+import wandb
 
 def get_args_parser():
     parser = argparse.ArgumentParser('Set transformer detector', add_help=False)
@@ -103,6 +104,7 @@ def get_args_parser():
 
 
 def main(args):
+    wandb.init(project="trials", name="DETR_NC2_011", sync_tensorboard=False)
     utils.init_distributed_mode(args)
     print("git:\n  {}\n".format(utils.get_sha()))
 
@@ -214,6 +216,7 @@ def main(args):
         test_stats, coco_evaluator = evaluate(
             model, criterion, postprocessors, data_loader_val, base_ds, device, args.output_dir
         )
+        print("Test stats : ", test_stats, coco_evaluator)
 
         log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
                      **{f'test_{k}': v for k, v in test_stats.items()},
